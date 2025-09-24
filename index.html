@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calcultor</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="index.js"></script>
+  </head>
+  <body>
+    <main class="calculator">
+      <div class="display" id="display">0</div>
+      <div class="buttons">
+        <button class="backspace"><</button>
+        <button class="all-clear">AC</button>
+        <button class="operator">÷</button>
+
+        <button class="number" onclick="inputNumber(7)">7</button>
+        <button class="number" onclick="inputNumber(8)">8</button>
+        <button class="number" onclick="inputNumber(9)">9</button>
+        <button class="operator">×</button>
+
+        <button class="number" onclick="inputNumber(4)">4</button>
+        <button class="number" onclick="inputNumber(5)">5</button>
+        <button class="number" onclick="inputNumber(6)">6</button>
+        <button class="operator">-</button>
+
+        <button class="number" onclick="inputNumber(1)">1</button>
+        <button class="number" onclick="inputNumber(2)">2</button>
+        <button class="number" onclick="inputNumber(3)">3</button>
+        <button class="operator">+</button>
+
+        <button class="wide-number" onclick="inputNumber(0)">0</button>
+        <button class="point">.</button>
+        <button class="operator equal">=</button>
+      </div>
+    </main>
+  </body>
+</html>
