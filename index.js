@@ -1,89 +1,133 @@
-let display = document.getElementById("display");
-const buttons = document.querySelectorAll("button");
+const calculator = document.getElementById('calculator')
+const keypad = calculator.querySelector('#keypad')
+const displayGroup = calculator.querySelector('#display-group')
+const expression = displayGroup.querySelector('#expression')
+let result = displayGroup.querySelector('#result')
+const allClear = keypad.querySelector('#all-clear')
 
-let currentInput = "0";
-let previousInput = "";
-let operator = "";
-
-// 1. 연산자 우선순위 비교하는 함수 하나
-// 2. 중위표현식을 후위표현식으로 변환해주는 함수 하나
-// 3. 후위표현식을 계산해주는 함수 하나 => 여기서 계산한 값을 display에 보여줌
-
-// 5. 연산자 우선순위 비교하는 함수
-function getOperatorPriority(operator) {
-  switch (operator) {
-    case "*":
-    case "/":
-      return 2;
-    case "+":
-    case "-":
-      return 1;
-  }
+const initializeEvents = () => {
+  // 키보드 이벤트
+  document.addEventListener('keydown', onKeyDown)
+  document.addEventListener('keyup', onKeyUp)
+  // 마우스 이벤트
+  keypad.addEventListener('mousedown', onMouseDown)
+  keypad.addEventListener('mouseup', onMouseUp)
 }
 
-// 6. 중위표현식을 후위표현식으로 변환해주는 함수
-function infixToPostfix(infix) {
-  const operators = ["*", "/", "+", "-"];
-  const stack = [];
-  const postfix = [];
+const onKeyDown = (event) => {
+  keypad.querySelector(`[data-code=${event.code}]`)?.classList.add('active')
+}
 
-  infix.split("").forEach((token) => {
+const onKeyUp = (event) => {
+  keypad.querySelector(`[data-code=${event.code}]`)?.classList.remove('active')
+}
+
+const onMouseDown = (event) => {
+  event.target.closest('.key')?.classList.add('active')
+}
+
+let input = ''
+
+const onMouseUp = (event) => {
+  const keyButton = event.target.closest('button.key')
+
+  const key = keyButton?.dataset.key
+  const code = keyButton?.dataset.code
+
+  switch (code) {
+    case 'Allclear':
+      result.innerHTML = '0'
+      expression.innerHTML = ''
+      input = ''
+      break
+    case 'Backspace':
+      input = input.slice(0, -1)
+      result.innerHTML = input
+      break
+    case 'Equal':
+      const postfix = convertPostfix(input)
+      // console.log('후위표현식 : ', postfix)
+      const infix = convertInfix(postfix)
+      // console.log('중위표현식 : ', infix)
+
+      expression.innerHTML = input
+      result.innerHTML = Number(infix).toLocaleString('ko-KR')
+      input = ''
+      break
+    default:
+      input += key
+      // console.log(input)
+      result.innerHTML = input
+      break
+  }
+
+  keypad.querySelector('.active')?.classList.remove('active')
+}
+
+// 1. 연산자 우선순위 비교 함수
+const operatorPrecedence = (operator) => {
+  if (operator === '+' || operator === '-') return 1
+  if (operator === '*' || operator === '/') return 2
+  return 0
+}
+
+// 2. 중위표현식을 후위표현식으로 변환해주는 함수
+// 10*10+10000/10 => 1010*1000010/+
+// 20.3 * 5.6 + 4.75 / 10 => 20.3 5.6 * 4.75 10 / +
+const convertPostfix = (expression) => {
+  const operators = ['*', '/', '+', '-']
+  const stack = []
+  const postfix = []
+
+  const infix = expression.match(/(\d+(\.\d+)?|[+\-*/])/g)
+
+  infix.forEach((token) => {
     if (operators.includes(token)) {
-      let poped = stack.pop();
-      if (getOperatorPriority(poped) > getOperatorPriority(token)) {
-        postfix.push(poped);
-      } else {
-        stack.push(poped);
+      while (
+        stack.length &&
+        operatorPrecedence(stack[stack.length - 1]) >= operatorPrecedence(token)
+      ) {
+        postfix.push(stack.pop())
       }
-      stack.push(token); //*+*
+      stack.push(token)
     } else {
-      postfix.push(token); //2426
+      postfix.push(token)
     }
-  });
-  while (stack.length !== 0) {
-    postfix.push(stack.pop());
+  })
+
+  while (stack.length) {
+    postfix.push(stack.pop())
   }
-  return postfix.join("");
+
+  return postfix.join(' ')
 }
 
-console.log(infixToPostfix("10*10+10000/10")); //1010*1000010/+
+// 후위표현식을 중위표현식으로 변환 후 계산해주는 함수
+// 10 10 * 10000 10 / + => 10*10+10000/10
+const convertInfix = (expression) => {
+  const operators = ['*', '/', '+', '-']
+  const stack = []
 
-function inputNumber(num) {
-  console.log(num);
+  expression.split(' ').forEach((token) => {
+    if (operators.includes(token)) {
+      let preOperand = parseFloat(stack.pop())
+      let postOperand = parseFloat(stack.pop())
+      let temp
 
-  if (currentInput === "0") {
-    currentInput = num.toString();
-  } else {
-    currentInput += num;
-  }
-  updateDisplay();
+      if (token === '+') temp = postOperand + preOperand
+      else if (token === '-') temp = postOperand - preOperand
+      else if (token === '*') temp = postOperand * preOperand
+      else if (token === '/') temp = postOperand / preOperand
+
+      stack.push(temp)
+    } else {
+      stack.push(token)
+    }
+  })
+
+  console.log(stack)
+
+  return stack[0]
 }
 
-function updateDisplay() {
-  console.log(currentInput);
-
-  display.textContent = currentInput;
-}
-buttons.forEach((button) => {
-  button.addEventListener("click", (event) => {
-    console.log(event.target.dataset.key);
-  });
-});
-
-document.addEventListener("keydown", (e) => {
-  console.log(e.key);
-});
-
-/*
-1. 지금 현재 마우스랑 키보드로 클릭한 숫자들 이벤트 처리해줬어.
-2. 그럼 이제 마우스랑 키보드로 클릭한 숫자들의 이벤트를 통합해줘야해.(왜냐면 마우스 클릭과 키보드 입력이 같은 방식으로 처리되어야 하니까)
-3. 통합했으면, 이제 각각의 연산자들(기능들) 함수를 만들어서 이 연산자가 어떻게 처리를 해줄지 알려주고,
-
-4. 그걸 가지고 엔터를 눌렀을때, display에 결과 보여줄 수 있도록 해야해.
-4-1. 그리고 display에 식을 보여주는 것도 변수 만들어서 해줘야 하고,
-5. 연산자 우선순위를 정하고, - hy
-6. 연산자 우선순위를 정한 것을 통해서 중위 표현식을 후위 표현식으로 변환하는 함수를 만들어야해. - hy
-7. 마지막으로 중위를 후위표현식으로 변환했으면 후위표현식을 계산하는 함수를 만들고,
-8. 계산 다 햇으면 결과 값을 display에 보여주기
-9. 리팩토링
-*/
+initializeEvents()

@@ -1,77 +1,96 @@
 * {
   box-sizing: border-box;
-  margin: 0;
 }
 
 body {
-  background-color: pink;
   font-family: 'Inter';
   display: flex;
-  justify-content: center;
-  align-items: center;
   width: 100%;
   height: 100vh;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
 }
 
+/* Reset CSS */
+p {
+  margin: 0;
+}
+
+/* 계산기 전체 영역 */
 .calculator {
-  background-color: #fff;
-  border-radius: 20px;
   width: 412px;
   margin: 0 auto;
 }
 
-.display {
+/* 디스플레이 영역 */
+.display-group {
+  background-color: #413c3c;
+  border: 1px solid black;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: end;
+  padding: 18px;
   border-radius: 20px 20px 0 0;
   height: 184px;
-  background-color: #413c3c;
-  color: #fff;
-  font-size: 50px;
-  padding: 18px;
-  text-align: right;
-  max-width: 100%;
-  height: 184px;
-  overflow: hidden;
-  white-space: nowrap; /* 줄바꿈 방지 */
-  direction: rtl; /* 마지막 입력이 보이도록 오른쪽 정렬  */
+  min-height: 184px;
 }
 
-.buttons {
+.display-group .expression {
+  font-size: 30px;
+  color: white;
+}
+.display-group .result {
+  font-size: 50px;
+  color: white;
+}
+
+/* 버튼 영역 */
+.keypad {
+  width: 100%;
+}
+
+.keypad .row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0;
 }
 
-button {
-  width: 103px;
+.keypad .row .key {
+  /* width: 103px; */
   height: 120px;
   border: 1px solid #8e8e8e;
   font-size: 50px;
   text-align: center;
   cursor: pointer;
+  transition: all 0.1s ease-in-out;
 }
 
-.backspace,
-.number,
-.point {
-  background-color: #e0e0e0;
+.keypad .row .key.wide {
+  grid-column: span 2; /* 0 버튼을 가로로 길게 */
 }
 
-.operator {
-  background-color: #e89650;
-  color: #fff;
+.key.operator {
+  background: orange;
+  color: white;
 }
 
-.all-clear,
-.wide-number {
-  grid-column: span 2;
-  width: 206px;
-  background-color: #e0e0e0;
-}
-
-.wide-number {
+.left-round {
   border-radius: 0 0 0 20px;
 }
 
-.equal {
+.right-round {
   border-radius: 0 0 20px 0;
+}
+
+.key:hover {
+  color: #8e8e8e;
+}
+
+.key.active {
+  background-color: #8e8e8e;
+  border: 1px solid #fff;
+  color: #fff;
 }

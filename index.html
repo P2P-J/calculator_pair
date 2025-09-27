@@ -3,37 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Calcultor</title>
     <link rel="stylesheet" href="style.css" />
+    <title>CALCULATOR</title>
     <script defer src="index.js"></script>
   </head>
   <body>
-    <main class="calculator">
-      <div class="display" id="display">0</div>
-      <div class="buttons">
-        <button class="backspace" data-key="<"><</button>
-        <button class="all-clear" data-key="ac">AC</button>
-        <button class="operator"data-key="/">÷</button>
-
-        <button class="number" data-key="7">7</button>
-        <button class="number" data-key="8">8</button>
-        <button class="number" data-key="9">9</button>
-        <button class="operator" data-key="*">×</button>
-
-        <button class="number" data-key="4">4</button>
-        <button class="number" data-key="5">5</button>
-        <button class="number" data-key="6">6</button>
-        <button class="operator" data-key="-">-</button>
-
-        <button class="number" data-key="1">1</button>
-        <button class="number" data-key="2">2</button>
-        <button class="number"data-key="3">3</button>
-        <button class="operator"data-key="+">+</button>
-
-        <button class="wide-number" data-key="0">0</button>
-        <button class="point" data-key="." >.</button>
-        <button class="operator equal" data-key="=">=</button>
+    <section id="calculator" class="calculator" aria-label="계산기">
+      <!-- 디스플레이 영역 -->
+      <output
+        id="display-group"
+        class="display-group"
+        aria-live="polite"
+        aria-label="계산기 디스플레이 영역"
+      >
+        <p id="expression" class="expression" aria-label="수식 표시"></p>
+        <div id="result" class="result" aria-label="계산 결과값 출력">0</div>
+      </output>
+      <!-- 버튼 영역 -->
+      <div id="keypad" class="keypad" role="group" aria-label="계산기 키패드">
+        <div class="row">
+          <button data-code="Backspace" data-key="Backspace" class="key">
+            <
+          </button>
+          <button
+            id="all-clear"
+            data-code="Allclear"
+            data-key="Allclear"
+            class="key wide"
+          >
+            AC
+          </button>
+          <button data-code="Slash" data-key="/" class="key operator">÷</button>
+        </div>
+        <div class="row">
+          <button data-code="Digit7" data-key="7" class="key">7</button>
+          <button data-code="Digit8" data-key="8" class="key">8</button>
+          <button data-code="Digit9" data-key="9" class="key">9</button>
+          <button data-code="" data-key="*" class="key operator">×</button>
+        </div>
+        <div class="row">
+          <button data-code="Digit4" data-key="4" class="key">4</button>
+          <button data-code="Digit5" data-key="5" class="key">5</button>
+          <button data-code="Digit6" data-key="6" class="key">6</button>
+          <button data-code="Minus" data-key="-" class="key operator">-</button>
+        </div>
+        <div class="row">
+          <button data-code="Digit1" data-key="1" class="key">1</button>
+          <button data-code="Digit2" data-key="2" class="key">2</button>
+          <button data-code="Digit3" data-key="3" class="key">3</button>
+          <button data-code="" data-key="+" class="key operator">+</button>
+        </div>
+        <div class="row">
+          <button data-code="Digit0" data-key="0" class="key wide left-round">
+            0
+          </button>
+          <button data-code="Period" data-key="." class="key">.</button>
+          <button
+            data-code="Equal"
+            data-key="Equal"
+            class="key operator right-round"
+          >
+            =
+          </button>
+        </div>
       </div>
-    </main>
+    </section>
   </body>
 </html>
