@@ -1,114 +1,77 @@
-const calculator = document.getElementById("calculator");
-const keypad = calculator.querySelector("#keypad");
-const displayGroup = calculator.querySelector("#display-group");
-const expression = displayGroup.querySelector("#expression");
-let result = displayGroup.querySelector("#result");
-const allClear = keypad.querySelector("#all-clear");
+const calculator = document.getElementById('calculator');
+const keypad = calculator.querySelector('#keypad');
+const displayGroup = calculator.querySelector('#display-group');
+const expression = displayGroup.querySelector('#expression');
+let result = displayGroup.querySelector('#result');
+const allClear = keypad.querySelector('#all-clear');
 
 const initializeEvents = () => {
-  // 키보드 이벤트
-  document.addEventListener("keydown", onKeyDown);
-  document.addEventListener("keyup", onKeyUp);
-  // 마우스 이벤트
-  keypad.addEventListener("mousedown", onMouseDown);
-  keypad.addEventListener("mouseup", onMouseUp);
+  document.addEventListener('keydown', onKeyDown);
+  document.addEventListener('keyup', onKeyUp);
+  keypad.addEventListener('mousedown', onMouseDown);
+  keypad.addEventListener('mouseup', onMouseUp);
 };
 
-let input = "";
+let input = '';
+const operators = ['*', '/', '+', '-'];
 
 const onKeyDown = (event) => {
   const keyButton = keypad.querySelector(`[data-code=${event.code}]`);
   const key = keyButton?.dataset.key;
 
-  let keys = event.key;
-
-  if (event.shiftKey && event.code === "Digit8") keys = "*";
-  if (event.shiftKey && event.code === "Equal") keys = "+";
-
-  if (event.code.startsWith("Digit")) {
+  if (event.code.startsWith('Digit')) {
     input += key;
     result.innerHTML = input;
   }
 
-  if (event.code === "Equal" || event.code === "Enter") {
-    if (input === "") {
-      return;
-    }
-    const postfix = convertPostfix(input);
-    // console.log('후위표현식 : ', postfix)
-    const infix = convertInfix(postfix);
-    // console.log('중위표현식 : ', infix)
-
-    expression.innerHTML = input;
-    result.innerHTML = Number(infix).toLocaleString("ko-KR");
-    input = result.textContent;
+  if (event.code === 'Equal' || event.code === 'Enter') {
+    equal();
   }
 
-  if (event.code === "Backspace") {
-    if (input.length > 0) {
-      input = input.slice(0, -1);
-      result.innerHTML = input === "" ? "0" : input;
-    } else {
-      result.innerHTML = "0";
-    }
+  if (event.code === 'Backspace') {
+    backspace();
   }
 
-  if (event.code === "Minus") {
+  if (event.code === 'Minus') {
     input += key;
     result.innerHTML = input;
   }
 
-  keypad.querySelector(`[data-code=${event.code}]`)?.classList.add("active");
+  keypad.querySelector(`[data-code=${event.code}]`)?.classList.add('active');
 };
 
 const onKeyUp = (event) => {
-  keypad.querySelector(`[data-code=${event.code}]`)?.classList.remove("active");
+  keypad.querySelector(`[data-code=${event.code}]`)?.classList.remove('active');
 };
 
 const onMouseDown = (event) => {
-  event.target.closest(".key")?.classList.add("active");
+  event.target.closest('.key')?.classList.add('active');
 };
 
 const onMouseUp = (event) => {
-  const keyButton = event.target.closest("button.key");
+  const keyButton = event.target.closest('button.key');
 
   const key = keyButton?.dataset.key;
   const code = keyButton?.dataset.code;
 
   const lastChar = input[input.length - 1];
-  const operators = ["+", "-", "*", "/"];
+  const operators = ['+', '-', '*', '/'];
 
   switch (code) {
-    case "Allclear":
-      result.innerHTML = "0";
-      expression.innerHTML = "";
-      input = "";
+    case 'Allclear':
+      result.innerHTML = '0';
+      expression.innerHTML = '';
+      input = '';
       break;
-    case "Backspace":
-      if (input.length > 0) {
-        input = input.slice(0, -1);
-        result.innerHTML = input === "" ? "0" : input;
-      } else {
-        result.innerHTML = "0";
-      }
-
+    case 'Backspace':
+      backspace();
       break;
-    case "Equal":
-      if (input === "") {
-        break;
-      }
-      const postfix = convertPostfix(input);
-      // console.log('후위표현식 : ', postfix)
-      const infix = convertInfix(postfix);
-      // console.log('중위표현식 : ', infix)
-
-      expression.innerHTML = input;
-      result.innerHTML = Number(infix).toLocaleString("ko-KR");
-      input = result.textContent;
+    case 'Equal':
+      equal();
       break;
     default:
-      if (input === "" && operators.includes(key)) {
-        input = "0" + key;
+      if (input === '' && operators.includes(key)) {
+        input = '0' + key;
         result.innerHTML = input;
         break;
       }
@@ -116,24 +79,24 @@ const onMouseUp = (event) => {
       if (operators.includes(lastChar) && operators.includes(key)) break;
 
       // 소수점 연속 입력 방지
-      if (lastChar === "." && key === ".") break;
+      if (lastChar === '.' && key === '.') break;
 
       // 현재 숫자에 소수점이 이미 있으면 방지
-      if (key === ".") {
+      if (key === '.') {
         const nums = input.split(/[+\-*/]/);
-        if (nums[nums.length - 1].includes(".")) break;
+        if (nums[nums.length - 1].includes('.')) break;
       }
 
-      if (key === "0") {
-        if (input === "0") break; //처음에 00 방지
+      if (key === '0') {
+        if (input === '0') break; //처음에 00 방지
         const nums = input.split(/[+\-*/]/);
         const zero = nums[nums.length - 1];
-        if (zero === "0") break;
+        if (zero === '0') break;
       }
 
-      if (key === ".") {
-        if (input === "" || operators.includes(lastChar)) {
-          input += "0.";
+      if (key === '.') {
+        if (input === '' || operators.includes(lastChar)) {
+          input += '0.';
           result.innerHTML = input;
           break;
         }
@@ -144,21 +107,18 @@ const onMouseUp = (event) => {
       break;
   }
 
-  keypad.querySelector(".active")?.classList.remove("active");
+  keypad.querySelector('.active')?.classList.remove('active');
 };
 
 // 1. 연산자 우선순위 비교 함수
 const operatorPrecedence = (operator) => {
-  if (operator === "+" || operator === "-") return 1;
-  if (operator === "*" || operator === "/") return 2;
+  if (operator === '+' || operator === '-') return 1;
+  if (operator === '*' || operator === '/') return 2;
   return 0;
 };
 
 // 2. 중위표현식을 후위표현식으로 변환해주는 함수
-// 10*10+10000/10 => 1010*1000010/+
-// 20.3 * 5.6 + 4.75 / 10 => 20.3 5.6 * 4.75 10 / +
 const convertPostfix = (expression) => {
-  const operators = ["*", "/", "+", "-"];
   const stack = [];
   const postfix = [];
 
@@ -182,25 +142,23 @@ const convertPostfix = (expression) => {
     postfix.push(stack.pop());
   }
 
-  return postfix.join(" ");
+  return postfix.join(' ');
 };
 
 // 후위표현식을 중위표현식으로 변환 후 계산해주는 함수
-// 10 10 * 10000 10 / + => 10*10+10000/10
 const convertInfix = (expression) => {
-  const operators = ["*", "/", "+", "-"];
   const stack = [];
 
-  expression.split(" ").forEach((token) => {
+  expression.split(' ').forEach((token) => {
     if (operators.includes(token)) {
       let preOperand = parseFloat(stack.pop());
       let postOperand = parseFloat(stack.pop());
       let temp;
 
-      if (token === "+") temp = postOperand + preOperand;
-      else if (token === "-") temp = postOperand - preOperand;
-      else if (token === "*") temp = postOperand * preOperand;
-      else if (token === "/") temp = postOperand / preOperand;
+      if (token === '+') temp = postOperand + preOperand;
+      else if (token === '-') temp = postOperand - preOperand;
+      else if (token === '*') temp = postOperand * preOperand;
+      else if (token === '/') temp = postOperand / preOperand;
 
       stack.push(temp);
     } else {
@@ -208,9 +166,26 @@ const convertInfix = (expression) => {
     }
   });
 
-  console.log(stack);
-
   return stack[0];
 };
+
+function backspace() {
+  if (input.length > 0) {
+    input = input.slice(0, -1);
+    result.innerHTML = input === '' ? '0' : input;
+  } else {
+    result.innerHTML = '0';
+  }
+}
+
+function equal() {
+  if (input === '') return;
+  const postfix = convertPostfix(input);
+  const infix = convertInfix(postfix);
+
+  expression.innerHTML = input;
+  result.innerHTML = Number(infix).toLocaleString('ko-KR');
+  input = result.textContent;
+}
 
 initializeEvents();
