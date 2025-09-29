@@ -1,9 +1,9 @@
 const calculator = document.getElementById('calculator');
 const keypad = calculator.querySelector('#keypad');
 const displayGroup = calculator.querySelector('#display-group');
-const expression = displayGroup.querySelector('#expression');
-let result = displayGroup.querySelector('#result');
-const allClear = keypad.querySelector('#all-clear');
+const expressionDisplay = displayGroup.querySelector('#expression');
+let resultDisplay = displayGroup.querySelector('#result');
+const clearButton = keypad.querySelector('#all-clear');
 
 const initializeEvents = () => {
   document.addEventListener('keydown', onKeyDown);
@@ -12,29 +12,29 @@ const initializeEvents = () => {
   keypad.addEventListener('mouseup', onMouseUp);
 };
 
-let input = '';
-const operators = ['*', '/', '+', '-'];
+let currentInput = '';
+const OPERATORS = ['*', '/', '+', '-'];
 
 const onKeyDown = (event) => {
   const keyButton = keypad.querySelector(`[data-code=${event.code}]`);
   const key = keyButton?.dataset.key;
 
-  if (event.code.startsWith('Digit')) {
-    input += key;
-    result.innerHTML = input;
-  }
-
-  if (event.code === 'Equal' || event.code === 'Enter') {
-    equal();
-  }
-
-  if (event.code === 'Backspace') {
-    backspace();
-  }
-
-  if (event.code === 'Minus') {
-    input += key;
-    result.innerHTML = input;
+  switch (event.code) {
+    case 'Backspace':
+      backspace();
+      break;
+    case 'Equal':
+    case 'Enter':
+      equal();
+      break;
+    case 'Minus':
+      currentInput += key;
+      resultDisplay.innerHTML = currentInput;
+      break;
+    default:
+      currentInput += key;
+      resultDisplay.innerHTML = currentInput;
+      break;
   }
 
   keypad.querySelector(`[data-code=${event.code}]`)?.classList.add('active');
@@ -54,14 +54,13 @@ const onMouseUp = (event) => {
   const key = keyButton?.dataset.key;
   const code = keyButton?.dataset.code;
 
-  const lastChar = input[input.length - 1];
-  const operators = ['+', '-', '*', '/'];
+  const lastChar = currentInput[currentInput.length - 1];
 
   switch (code) {
     case 'Allclear':
-      result.innerHTML = '0';
-      expression.innerHTML = '';
-      input = '';
+      resultDisplay.innerHTML = '0';
+      expressionDisplay.innerHTML = '';
+      currentInput = '';
       break;
     case 'Backspace':
       backspace();
@@ -70,65 +69,62 @@ const onMouseUp = (event) => {
       equal();
       break;
     default:
-      if (input === '' && operators.includes(key)) {
-        input = '0' + key;
-        result.innerHTML = input;
+      if (currentInput === '' && OPERATORS.includes(key)) {
+        currentInput = '0' + key;
+        resultDisplay.innerHTML = currentInput;
         break;
       }
 
-      if (operators.includes(lastChar) && operators.includes(key)) break;
+      if (OPERATORS.includes(lastChar) && OPERATORS.includes(key)) break;
 
-      // 소수점 연속 입력 방지
       if (lastChar === '.' && key === '.') break;
 
-      // 현재 숫자에 소수점이 이미 있으면 방지
       if (key === '.') {
-        const nums = input.split(/[+\-*/]/);
+        const nums = currentInput.split(/[+\-*/]/);
         if (nums[nums.length - 1].includes('.')) break;
       }
 
       if (key === '0') {
-        if (input === '0') break; //처음에 00 방지
-        const nums = input.split(/[+\-*/]/);
+        if (currentInput === '0') break;
+        const nums = currentInput.split(/[+\-*/]/);
         const zero = nums[nums.length - 1];
         if (zero === '0') break;
       }
 
       if (key === '.') {
-        if (input === '' || operators.includes(lastChar)) {
-          input += '0.';
-          result.innerHTML = input;
+        if (currentInput === '' || OPERATORS.includes(lastChar)) {
+          currentInput += '0.';
+          resultDisplay.innerHTML = currentInput;
           break;
         }
       }
 
-      input += key;
-      result.innerHTML = input;
+      currentInput += key;
+      resultDisplay.innerHTML = currentInput;
       break;
   }
 
   keypad.querySelector('.active')?.classList.remove('active');
 };
 
-// 1. 연산자 우선순위 비교 함수
-const operatorPrecedence = (operator) => {
+const getOperatorPriority = (operator) => {
   if (operator === '+' || operator === '-') return 1;
   if (operator === '*' || operator === '/') return 2;
   return 0;
 };
 
-// 2. 중위표현식을 후위표현식으로 변환해주는 함수
-const convertPostfix = (expression) => {
+const convertToPostfix = (expression) => {
   const stack = [];
   const postfix = [];
 
   const infix = expression.match(/(\d+(\.\d+)?|[+\-*/])/g);
 
   infix.forEach((token) => {
-    if (operators.includes(token)) {
+    if (OPERATORS.includes(token)) {
       while (
         stack.length &&
-        operatorPrecedence(stack[stack.length - 1]) >= operatorPrecedence(token)
+        getOperatorPriority(stack[stack.length - 1]) >=
+          getOperatorPriority(token)
       ) {
         postfix.push(stack.pop());
       }
@@ -145,22 +141,21 @@ const convertPostfix = (expression) => {
   return postfix.join(' ');
 };
 
-// 후위표현식을 중위표현식으로 변환 후 계산해주는 함수
-const convertInfix = (expression) => {
+const calculateToInfix = (expression) => {
   const stack = [];
 
   expression.split(' ').forEach((token) => {
-    if (operators.includes(token)) {
+    if (OPERATORS.includes(token)) {
       let preOperand = parseFloat(stack.pop());
       let postOperand = parseFloat(stack.pop());
-      let temp;
+      let tempResult;
 
-      if (token === '+') temp = postOperand + preOperand;
-      else if (token === '-') temp = postOperand - preOperand;
-      else if (token === '*') temp = postOperand * preOperand;
-      else if (token === '/') temp = postOperand / preOperand;
+      if (token === '+') tempResult = postOperand + preOperand;
+      else if (token === '-') tempResult = postOperand - preOperand;
+      else if (token === '*') tempResult = postOperand * preOperand;
+      else if (token === '/') tempResult = postOperand / preOperand;
 
-      stack.push(temp);
+      stack.push(tempResult);
     } else {
       stack.push(token);
     }
@@ -170,22 +165,22 @@ const convertInfix = (expression) => {
 };
 
 function backspace() {
-  if (input.length > 0) {
-    input = input.slice(0, -1);
-    result.innerHTML = input === '' ? '0' : input;
+  if (currentInput.length > 0) {
+    currentInput = currentInput.slice(0, -1);
+    resultDisplay.innerHTML = currentInput === '' ? '0' : currentInput;
   } else {
-    result.innerHTML = '0';
+    resultDisplay.innerHTML = '0';
   }
 }
 
 function equal() {
-  if (input === '') return;
-  const postfix = convertPostfix(input);
-  const infix = convertInfix(postfix);
+  if (currentInput === '') return;
+  const postfix = convertToPostfix(currentInput);
+  const infix = calculateToInfix(postfix);
 
-  expression.innerHTML = input;
-  result.innerHTML = Number(infix).toLocaleString('ko-KR');
-  input = result.textContent;
+  expressionDisplay.innerHTML = currentInput;
+  resultDisplay.innerHTML = Number(infix).toLocaleString('ko-KR');
+  currentInput = resultDisplay.textContent;
 }
 
 initializeEvents();

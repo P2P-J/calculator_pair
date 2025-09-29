@@ -1,20 +1,21 @@
+/* Reset CSS */
 * {
   box-sizing: border-box;
 }
 
-body {
-  font-family: "Inter";
-  display: flex;
-  width: 100%;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
-  margin: 0 auto;
-}
-
-/* Reset CSS */
 p {
   margin: 0;
+}
+
+/* Base Styles */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  margin: 0 auto;
+  font-family: 'Inter';
 }
 
 /* 계산기 전체 영역 */
@@ -25,26 +26,26 @@ p {
 
 /* 디스플레이 영역 */
 .display-group {
-  background-color: #413c3c;
-  border: 1px solid black;
-
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: end;
-  padding: 18px;
-  border-radius: 20px 20px 0 0;
   height: 184px;
   min-height: 184px;
+  padding: 18px;
+  border: 1px solid black;
+  border-radius: 20px 20px 0 0;
+  background-color: #413c3c;
 }
 
 .display-group .expression {
+  color: white;
   font-size: 30px;
-  color: white;
 }
+
 .display-group .result {
-  font-size: 50px;
   color: white;
+  font-size: 50px;
 }
 
 /* 버튼 영역 */
@@ -59,21 +60,21 @@ p {
 }
 
 .keypad .row .key {
-  /* width: 103px; */
   height: 120px;
   border: 1px solid #8e8e8e;
   font-size: 50px;
   text-align: center;
   cursor: pointer;
   transition: all 0.1s ease-in-out;
+  cursor: pointer;
 }
 
 .keypad .row .key.wide {
-  grid-column: span 2; /* 0 버튼을 가로로 길게 */
+  grid-column: span 2;
 }
 
 .key.operator {
-  background: orange;
+  background-color: orange;
   color: white;
 }
 
@@ -86,6 +87,7 @@ p {
 }
 
 .key:hover {
+  background-color: rgba(142, 142, 142, 0.1);
   color: #8e8e8e;
 }
 
