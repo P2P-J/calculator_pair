@@ -53,6 +53,11 @@ const onKeyDown = (event) => {
     }
   }
 
+  if (event.code === "Minus") {
+    input += key;
+    result.innerHTML = input;
+  }
+
   keypad.querySelector(`[data-code=${event.code}]`)?.classList.add("active");
 };
 
